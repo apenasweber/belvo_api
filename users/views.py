@@ -1,39 +1,34 @@
-from rest_framework import viewsets
-from users.serializers import UserSerializer, TransactionSerializer
-from users.models import User, Transaction
-"""
-USER MODEL
-id
-name
-email
-age
-created_at
+from rest_framework.response import Response
+from rest_framework import viewsets, status
 
-USER_TRANSACTION MODEL
-reference
-account
-date
-ammount
-type
-category
-user_id(FK user.id)
-created_at
+from users.filters import TransactionFilter, UserFilter
+from users.models import Transaction, User
+from users.serializers import TransactionSerializer, UserSerializer
 
-ENDPOINTS:
-create user
-get user
-get all users
-save transaction
-post transactions
-get transactions by user
-get transactions by user and category
-"""
+
 class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
-    
+    filterset_class = UserFilter
+
 
 class TransactionViewSet(viewsets.ModelViewSet):
+    """
+    Create transaction by user_email and list transactions by id and/or type
+    """
+
     serializer_class = TransactionSerializer
     queryset = Transaction.objects.all()
-    
+    filterset_class = TransactionFilter
+
+    def create(self, request, *args, **kwargs):
+        is_many = isinstance(request.data, list)
+        if not is_many:
+            return super(TransactionViewSet, self).create(request, *args, **kwargs)
+        serializer = self.get_serializer(data=request.data, many=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
