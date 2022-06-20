@@ -43,4 +43,13 @@ TestTransactionGet
 - get transaction by user_email 200 [check]
 - get transactions by user_email and type 200 [check]
 # TODO swagger [check]
-# TODO dockerize
+# TODO dockerize [check]
+
+
+RUN TESTS
+docker-compose up -d
+docker exec -it belvo_api bash
+python manage.py test
+
+RUN APPLICATION 
+docker-compose up
