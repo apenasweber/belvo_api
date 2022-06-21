@@ -53,17 +53,21 @@ python manage.py runserver
 
 
 ## Documentation
+To test the api endpoints using postman, you can insert on "body", "form-data" inserting key/value or just writing on the route something like:
+
+    // POST
+    http://localhost:8000/users/?name=Jane Doe&email=janedoe@email.com
 
 1. Can create users in `POST /users` endpoint by receiving JSON data as the example below.
 
    ```json
    // POST data
-   {"name": "Jane Doe", "email": "jane@email.com"}
+   {"name": "Jane Doe", "email": "janedoe@email.com"}
    ```
 
 2. `GET /users` can list all users, but you also can get a specific user using its email `GET /users?email=janedoe@email.com`
 
-3. Can save user's transactions. Each transaction has: reference (unique), date, amount, type, category and user's email.
+3. `POST /transactions` Can save user's transactions. Each transaction has: reference (unique), date, amount, type, category and user's email.
 
    ```json
    // Single transaction data
@@ -73,7 +77,7 @@ python manage.py runserver
    And you can upload them with a POST request of a list of transactions (bulk) in `POST /transactions`. This endpoint will consider only valid transactions (removing duplicates).
 
    ```json
-   // POST data
+   // POST bulk data
    [
      {"reference": "000051", "date": "2020-01-03", "amount": "-51.13", "type": "outflow", "category": "groceries", "user_email": "janedoe@email.com"},
      {"reference": "000052", "date": "2020-01-10", "amount": "2500.72", "type": "inflow", "category": "salary", "user_email": "janedoe@email.com"}
@@ -83,17 +87,17 @@ python manage.py runserver
 
    
 
-4. You can get a user's transaction summary in `GET /user/<user_email>/transactions_summary` .
+4. You can get a user's transaction summary in `GET /users/<user_email>/transactions_summary` .
 
    ```json
    // Response
    [
-      {"user_email":"janedoe@email.com", "balance":1738.87, "total_inflow":2500.72," total_outflow":-761.85},
-      {"user_email":"janedoe@email.com", "balance":150.72, "total_inflow":150.72, "total_outflow":0.0}
+      {"user_email":"janedoe@email.com","total_inflow":2500.72," total_outflow":-761.85},
+      {"user_email":"janedoe@email.com","total_inflow":150.72, "total_outflow":0.0}
    ]
    ```
 
-5. You can get a user's transactions summary by categories in `GET /user/<user_email>/transactions_by_category`
+5. You can get a user's transactions summary by categories in `GET /users/<user_email>/transactions_by_category`
 
    ```json
    // Response
