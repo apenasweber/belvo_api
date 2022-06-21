@@ -1,55 +1,103 @@
-# TODO apply constraints
-● A transaction reference is unique. [check]
-● There are only two types of transactions: inflow and outflow.[check]
-● All outflow transactions amounts are negative decimal numbers. [check]
-● All inflow transactions amounts are positive decimal numbers. [check]
-● We expect to receive transactions in bulk as well.[check]
-● The transactions we receive could be already in our system, thus we need to avoid
-duplicating them in our database.[check]
+# Belvo User Transactions API
 
-# TODO create routes
->>> USERS
-● post user[check]
-● get all users = api/users/ [check]
-● get user by email = api/users/{email} [check]
+Belvo Challenge API. Project was built with Django, DRF and Python 3.8. It uses SQLite for data persistence and ApiTestCase from DRF as testing suite. All the project was organized in a development environment so environment variables is not ommited.
 
 
->>> TRANSACTIONS
-● post transaction[check]
-● post transactions[check]
-● get transactions by user_email [check]
-● get transactions by user_email and type [check]
+## Installation and run
 
-# TODO tests
-TesteUserPost
-- post user with name/email 200 [check]
-- post with no name/email 400 [check]
-- post user with existing email 400 [check]
-
-TestUserGet
-- get all users 200 [check]
-- get user by email 200 [check]
-
-TestTransactionPost
-- post transaction 200 [check]
-- post bulk transactions 200
-- post transaction with no amount 400 [check]
-- post transaction with inflow type and negative number 400 [check]
-- post transaction with outflow type and positive number 400 [check]
-- post transaction with existing reference 400 [check]
-
-TestTransactionGet
-- get all transactions 200 [check]
-- get transaction by user_email 200 [check]
-- get transactions by user_email and type 200 [check]
-# TODO swagger [check]
-# TODO dockerize [check]
-
-
-RUN TESTS
+1. You can use docker-compose to run application and database together in root folder of project with:
+```bash
 docker-compose up -d
-docker exec -it belvo_api bash
+```
+
+2. To run tests, you can use:
+
+```bash
+docker exec -it belvo_api bash 
+```
+
+```bash
+python manage.py test
+```
+3. In console you can write "exit" to finish the application bash and proceed to next steps.
+
+4. To access the docs of api you can access:
+
+ - http://localhost:8000/swagger/
+ - http://localhost:8000/redoc
+
+OR if you like the old times, you can create a virtualenv to install the whole application.
+
+```bash
+# Create virtualenv
+virtualenv venv
+
+# Activate yout virtualenv
+source venv/bin/activate
+
+# Install dependencies 
+pip install -r requirements.txt
+
+# Run migrations
+python manage.py makemigrations 
+
+# Run migrate
+python manage.py migrate 
+
+# Run tests
 python manage.py test
 
-RUN APPLICATION 
-docker-compose up
+# Run whole application
+python manage.py runserver
+```
+
+
+## Documentation
+
+1. Can create users in `POST /users` endpoint by receiving JSON data as the example below.
+
+   ```json
+   // POST data
+   {"name": "Jane Doe", "email": "jane@email.com"}
+   ```
+
+2. `GET /users` can list all users, but you also can get a specific user using its email `GET /users?email=janedoe@email.com`
+
+3. Can save user's transactions. Each transaction has: reference (unique), date, amount, type, category and user's email.
+
+   ```json
+   // Single transaction data
+   {"reference": "000051", "date": "2020-01-13", "amount": "-51.13", "type": "outflow", "category": "groceries", "user_email": janedoe@email.com}
+   ```
+
+   And you can upload them with a POST request of a list of transactions (bulk) in `POST /transactions`. This endpoint will consider only valid transactions (removing duplicates).
+
+   ```json
+   // POST data
+   [
+     {"reference": "000051", "date": "2020-01-03", "amount": "-51.13", "type": "outflow", "category": "groceries", "user_email": "janedoe@email.com"},
+     {"reference": "000052", "date": "2020-01-10", "amount": "2500.72", "type": "inflow", "category": "salary", "user_email": "janedoe@email.com"}
+     // ... 
+   ]
+   ```
+
+   
+
+4. You can get a user's transaction summary in `GET /user/<user_email>/transactions_summary` .
+
+   ```json
+   // Response
+   [
+      {"user_email":"janedoe@email.com", "balance":1738.87, "total_inflow":2500.72," total_outflow":-761.85},
+      {"user_email":"janedoe@email.com", "balance":150.72, "total_inflow":150.72, "total_outflow":0.0}
+   ]
+   ```
+
+5. You can get a user's transactions summary by categories in `GET /user/<user_email>/transactions_by_category`
+
+   ```json
+   // Response
+   {"inflow":{"salary":2500.72,"savings":150.72},"outflow":{"groceries":-51.13,"rent":-560.0,"transfer":-150.72}}
+   ```
+
+
