@@ -7,6 +7,10 @@ Belvo Challenge API. Project was built with Django, DRF and Python 3.8. It uses 
 
 1. You can use docker-compose to run application and database together in root folder of project with:
 ```bash
+docker-compose up --build
+```
+
+```bash
 docker-compose up -d
 ```
 
