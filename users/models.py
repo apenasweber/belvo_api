@@ -26,7 +26,7 @@ class Transaction(models.Model):
     type = models.CharField(max_length=255, choices=type_choices)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     category = models.CharField(max_length=255)
-    user_email = models.ForeignKey(User, to_field="email", on_delete=models.CASCADE)
+    user_email = models.ForeignKey(User, to_field="email", on_delete=models.CASCADE, default=None)
     REQUIRED_FIELDS = ["reference", "date", "type", "amount", "category", "user_email"]
 
     class Meta:
