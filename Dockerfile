@@ -10,10 +10,10 @@ ENV PYTHONUNBUFFERED 1
 # create root directory for our project in the container
 RUN mkdir /belvo_api
 
-# Set the working directory to /music_service
+# Set the working directory to /belvo_api
 WORKDIR /belvo_api
 
-# Copy the current directory contents into the container at /music_service
+# Copy the current directory contents into the container at /belvo_api
 ADD . /belvo_api/
 
 # Install any needed packages specified in requirements.txt
