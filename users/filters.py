@@ -18,3 +18,7 @@ class UserFilter(filters.FilterSet):
     class Meta:
         model = User
         fields = ("email",)
+
+
+
+# TODO We want to be able to see a user's summary by category that shows the sum of amounts per transaction category

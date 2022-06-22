@@ -22,6 +22,7 @@ schema_view = get_schema_view(
 route = routers.DefaultRouter()
 route.register("users", views.UserViewSet, basename="users")
 route.register("transactions", views.TransactionViewSet, basename="transactions")
+route.register("transactions_summary", views.UserTransactionViewSet, basename="transactions_summary")
 
 urlpatterns = [
     re_path(

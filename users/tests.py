@@ -84,9 +84,9 @@ class TestTransactionPost(APITestCase):
             response = self.client.post(reverse("transactions-list"), transaction)
             self.assertEqual(response.status_code, 201)
 
-    def test_transaction_post_without_ammount(self):
+    def test_transaction_post_without_amount(self):
         self.client.post(reverse("users-list"), user_sample)
-        not_ammount_transaction_sample = {
+        not_amount_transaction_sample = {
             "reference": "Teste",
             "date": "2020-01-01",
             "type": "inflow",
@@ -94,7 +94,7 @@ class TestTransactionPost(APITestCase):
             "user_email": "tester@email.com",
             "amount": "",
         }
-        response = self.client.post(reverse("transactions-list"), not_ammount_transaction_sample)
+        response = self.client.post(reverse("transactions-list"), not_amount_transaction_sample)
         self.assertEqual(response.status_code, 400)
 
     def test_transaction_post_with_inflow_type_and_negative_amount(self):
@@ -168,3 +168,60 @@ class TestTransactionGet(APITestCase):
         self.assertEqual(transaction_type, "inflow")
         self.assertEqual(email, "tester@email.com")
         self.assertEqual(number_of_transactions, 1)
+    
+    def test_transaction_get_summary_by_type(self):
+        self.client.post(reverse("users-list"), user_sample)
+        self.client.post(reverse("transactions-list"), transaction_sample)
+        transaction_sample_2 = {
+            "reference": "000064",
+            "date": "2020-01-10",
+            "amount": "100",
+            "type": "inflow",
+            "category": "salary",
+            "user_email": "tester@email.com",
+        }
+        self.client.post(reverse("transactions-list"), transaction_sample_2)
+        transaction_sample_3 = {
+            "reference": "000065",
+            "date": "2020-01-10",
+            "amount": "-100",
+            "type": "outflow",
+            "category": "salary",
+            "user_email": "tester@email.com",
+        }
+        self.client.post(reverse("transactions-list"), transaction_sample_3)
+        inflow_response = self.client.get(reverse("transactions_summary-list"))
+        expected_email = "tester@email.com"
+        expected_total_inflow = 200
+        expected_total_outflow = -100
+        self.assertEqual(inflow_response.data[0]["email"], expected_email)
+        self.assertEqual(inflow_response.data[0]["total_amount_by_inflow"], expected_total_inflow)
+        self.assertEqual(inflow_response.data[0]["total_amount_by_outflow"], expected_total_outflow)
+        
+        # ('total_amount_by_inflow', Decimal('200')), ('total_amount_by_outflow', Decimal('-100')
+    def test_transaction_get_summary_by_category(self):
+        self.client.post(reverse("users-list"), user_sample)
+        self.client.post(reverse("transactions-list"), transaction_sample)
+        transaction_sample_2 = {
+            "reference": "000064",
+            "date": "2020-01-10",
+            "amount": "-100",
+            "type": "outflow",
+            "category": "mcdonalds",
+            "user_email": "tester@email.com",
+        }
+        self.client.post(reverse("transactions-list"), transaction_sample_2)
+        transaction_sample_3 = {
+            "reference": "000065",
+            "date": "2020-01-10",
+            "amount": "10000",
+            "type": "inflow",
+            "category": "salary",
+            "user_email": "tester@email.com",
+        }
+        self.client.post(reverse("transactions-list"), transaction_sample_3)
+        categories_response = self.client.get(reverse("transactions_summary-summary"))
+        expected_inflow = 10000.00
+        expected_outflow = -100.00
+        self.assertEqual(categories_response.data["inflow"]["salary"], expected_inflow)
+        self.assertEqual(categories_response.data["outflow"]["mcdonalds"], expected_outflow)

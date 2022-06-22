@@ -53,7 +53,6 @@ python manage.py runserver
 
 
 ## Documentation
-To test the api endpoints using postman, you can insert on "body", "form-data" inserting key/value or just writing on the route something like:
 
     // POST
     http://localhost:8000/users/?name=Jane Doe&email=janedoe@email.com
@@ -87,7 +86,7 @@ To test the api endpoints using postman, you can insert on "body", "form-data" i
 
    
 
-4. You can get a user's transaction summary in `GET /users/<user_email>/transactions_summary` .
+4. You can get a user's transaction summary in `GET /transactions_summary/?email=janedoe@email.com` or  `GET /transactions_summary/` to retrieve all.
 
    ```json
    // Response
@@ -97,7 +96,7 @@ To test the api endpoints using postman, you can insert on "body", "form-data" i
    ]
    ```
 
-5. You can get a user's transactions summary by categories in `GET /users/<user_email>/transactions_by_category`
+5. You can get a user's transactions summary by categories in `GET /transactions_summary/summary/<user_email>`
 
    ```json
    // Response
